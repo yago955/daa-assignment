@@ -1,0 +1,33 @@
+======================================================================
+PG-Match demo  (synthetic city, travel times in minutes)
+======================================================================
+
+[1] KMP: listings mentioning 'wifi': 6 of 8
+    raw KMP hits for 'ac' across all text: 9 (includes 'spACious', 'Non AC')
+    listings that really offer AC (word boundary + negation check): ['Sri Sai Residency', 'Nest Co-living', 'Lotus Ladies PG', 'Urban Den']
+    prefix function of 'abab': [0, 0, 1, 2]
+
+[2] Dijkstra from Campus:
+    Campus           0 min  via Campus
+    Katpadi Jn       9 min  via Campus -> Katpadi Jn
+    Gandhi Nagar     6 min  via Campus -> Gandhi Nagar
+    Sathuvachari    28 min  via Campus -> Gandhi Nagar -> Bus Stand -> Sathuvachari
+    Bagayam         33 min  via Campus -> Gandhi Nagar -> Bus Stand -> Old Town -> Bagayam
+    Thorapadi       31 min  via Campus -> Gandhi Nagar -> Bus Stand -> Old Town -> Thorapadi
+    Old Town        22 min  via Campus -> Gandhi Nagar -> Bus Stand -> Old Town
+    Bus Stand       18 min  via Campus -> Gandhi Nagar -> Bus Stand
+
+[3] Floyd-Warshall APSP (8x8); row 'Campus' matches Dijkstra: True
+
+[5] Top-3 PGs by score (rating, rent, commute):
+     75.98  Comfort Stay PG    Rs 6000  9 min  3.9 stars
+     70.95  Sri Sai Residency  Rs 7500  6 min  4.3 stars
+     67.36  Royal Boys Hostel  Rs 5800  18 min  3.5 stars
+
+[4] 0/1 Knapsack, add-on budget Rs 3500: utility 40, cost Rs 3450
+    chosen: ['Gym access', 'Daily housekeeping', 'Laundry', 'Unlimited high-speed wifi', 'Dinner plan', 'Power backup']
+    greedy-by-ratio would give utility 36 (cost Rs 2750)
+
+[6] Edmonds-Karp allocation: 10 of 20 students placed (25 beds, 35 eligible student-PG pairs)
+    unplaced (no eligible PG with a free bed): ['S03', 'S06', 'S08', 'S09', 'S10', 'S13', 'S14', 'S16', 'S19', 'S20']
+    greedy first-come baseline places only 9 of 20

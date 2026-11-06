@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DAA Assignment · BCSE204L</title>
+<meta name="description" content="DAA Assignment (BCSE204L): six classical algorithms (KMP, Dijkstra, Floyd–Warshall, 0/1 Knapsack, heap top-k, Edmonds–Karp) applied to finding and allotting rooms.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f7f5;--panel:#ffffff;--ink:#1b1b1f;--muted:#62626b;--line:#e3e2de;--soft:#f0efec;
+  --accent:#2457d6;--accent-soft:#e7eefc;--good:#1f8a4c;--good-soft:#e3f3ea;--bad:#c0392b;--bad-soft:#fbebeb;
+  --hl:#ffe9a8;--shadow:0 1px 2px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#111214;--panel:#1a1b1e;--ink:#ececef;--muted:#9a9aa3;--line:#2c2d31;--soft:#232428;
+  --accent:#6f97ff;--accent-soft:#1f2a45;--good:#4cc37f;--good-soft:#173324;--bad:#ff7a6b;--bad-soft:#3a1d1a;
+  --hl:#6b5514;--shadow:none;
+}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Inter,system-ui,sans-serif}
+code,.mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.9em}
+a{color:var(--accent)}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+header{padding:48px 0 24px}
+.kicker{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-size:clamp(30px,5vw,44px);line-height:1.1;margin:8px 0 12px;letter-spacing:-.02em}
+.lead{font-size:17px;color:var(--muted);max-width:720px;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:18px;font-size:14px;color:var(--muted)}
+.meta b{color:var(--ink);font-weight:600}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);text-decoration:none;font-weight:500;font-size:14px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+h2{font-size:22px;margin:48px 0 6px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 4px;font-size:15px}
+.card .cx{font-family:"JetBrains Mono",monospace;font-size:12.5px;color:var(--accent);background:var(--accent-soft);padding:2px 7px;border-radius:5px;display:inline-block;margin:4px 0 8px}
+.card p{margin:0;color:var(--muted);font-size:14px}
+.num{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--soft);font-size:12px;font-weight:600;align-items:center;justify-content:center;margin-right:6px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:0}
+.tab{appearance:none;border:0;background:none;padding:10px 14px;font:inherit;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab[aria-selected=true]{color:var(--ink);border-bottom-color:var(--accent)}
+.pane{display:none;background:var(--panel);border:1px solid var(--line);border-top:0;border-radius:0 0 12px 12px;padding:20px;box-shadow:var(--shadow)}
+.pane.on{display:block}
+.row{display:flex;flex-wrap:wrap;gap:20px}
+.col{flex:1 1 300px;min-width:0}
+label{font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px}
+input[type=text],select{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.ctl{margin-bottom:14px}
+.ctl .val{float:right;font-family:"JetBrains Mono",monospace;color:var(--ink);font-weight:500}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+mark{background:var(--hl);color:inherit;border-radius:3px;padding:0 1px}
+.pill{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;background:var(--soft);color:var(--muted);margin:2px 4px 2px 0}
+.pill.on{background:var(--good-soft);color:var(--good)}
+.pill.off{background:var(--bad-soft);color:var(--bad);text-decoration:line-through}
+.stat{display:flex;gap:12px;flex-wrap:wrap;margin:6px 0 14px}
+.stat div{background:var(--soft);border-radius:10px;padding:10px 14px;min-width:120px}
+.stat b{display:block;font-size:22px;letter-spacing:-.01em}
+.stat span{font-size:12.5px;color:var(--muted)}
+.stat .win{background:var(--good-soft)}
+.stat .win b{color:var(--good)}
+.note{font-size:13px;color:var(--muted);margin-top:12px}
+.lps{display:flex;flex-wrap:wrap;gap:2px;margin-top:6px}
+.lps div{font-family:"JetBrains Mono",monospace;font-size:12px;text-align:center;border:1px solid var(--line);border-radius:4px;min-width:26px;padding:2px 4px}
+.lps div i{display:block;font-style:normal;color:var(--accent);font-weight:600}
+svg text{font-family:Inter,sans-serif}
+.map{width:100%;height:auto;background:var(--bg);border-radius:10px;border:1px solid var(--line)}
+.charts{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.chart h3{font-size:14px;margin:0 0 2px}
+.chart p{margin:0 0 8px;font-size:13px;color:var(--muted)}
+.chart svg{width:100%;height:auto}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:4px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.fw td{font-family:"JetBrains Mono",monospace;font-size:12px;text-align:center;padding:5px 4px}
+.fw th{font-size:10.5px;text-transform:none;letter-spacing:0;text-align:center;padding:4px 3px}
+.fw td.hi{background:var(--accent-soft);color:var(--accent);font-weight:600}
+footer{margin:56px 0 40px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+@media (max-width:560px){header{padding-top:32px}.pane{padding:14px}.tab{padding:9px 10px;font-size:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="kicker">BCSE204L · Design and Analysis of Algorithms</div>
+  <h1>DAA Assignment</h1>
+  <p class="lead">Six classical algorithms, written from scratch, applied to one real problem: finding a paying-guest room near campus and allotting students to the beds that are left.</p>
+  <div class="meta"><span>By <b>Anubhab Baruah</b> (24BPS1152)</span></div>
+  <div class="btns">
+    <a class="btn primary" href="report.pdf" target="_blank" rel="noopener">Read the report (PDF)</a>
+    <a class="btn" href="pg_match.py" download>Download source (Python)</a>
+    <a class="btn" href="#demo">Try the live demo ↓</a>
+  </div>
+</header>
+
+<h2>The six algorithms</h2>
+<p class="sub">Each feature of the engine is one textbook problem.</p>
+<div class="grid">
+  <div class="card"><h3><span class="num">1</span>KMP string matching</h3><span class="cx">O(n + m)</span><p>Finds amenity keywords (AC, wifi, CCTV) in free-text listings, with word-boundary and "non" negation checks.</p></div>
+  <div class="card"><h3><span class="num">2</span>Dijkstra (binary heap)</h3><span class="cx">O((V + E) log V)</span><p>Shortest commute and actual route from your college to every locality.</p></div>
+  <div class="card"><h3><span class="num">3</span>Floyd–Warshall</h3><span class="cx">O(V³)</span><p>All-pairs commute table; its rows cross-check Dijkstra exactly.</p></div>
+  <div class="card"><h3><span class="num">4</span>0/1 Knapsack (DP)</h3><span class="cx">O(n · W)</span><p>Best set of add-ons (gym, laundry, dinner…) within a monthly budget.</p></div>
+  <div class="card"><h3><span class="num">5</span>Heap-based top-k</h3><span class="cx">O(N log k)</span><p>Ranks PGs by rating, rent and commute and keeps only the best k.</p></div>
+  <div class="card"><h3><span class="num">6</span>Edmonds–Karp max flow</h3><span class="cx">O(V · E²)</span><p>Allots students to PGs under bed limits, budgets and commute limits — provably optimal.</p></div>
+</div>
+
+<h2 id="demo">Live demo</h2>
+<p class="sub">The same algorithms, running in your browser on the sample city. Travel times, rents and ratings are illustrative.</p>
+<div class="ctl" style="max-width:320px">
+  <label for="origin">Your college / office</label>
+  <select id="origin"></select>
+</div>
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" aria-selected="true" data-p="p-kmp">1 · Search</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="p-dij">2–3 · Commute</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="p-rank">5 · Ranking</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="p-knap">4 · Add-ons</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="p-flow">6 · Allotment</button>
+</div>
+
+<section class="pane on" id="p-kmp">
+  <div class="row">
+    <div class="col" style="flex:0 1 280px">
+      <div class="ctl"><label for="pat">Search listings for</label><input id="pat" type="text" value="AC" autocomplete="off"></div>
+      <div class="stat"><div><b id="kmpRaw">0</b><span>raw KMP hits</span></div><div class="win"><b id="kmpReal">0</b><span>PGs that really match</span></div></div>
+      <label>Prefix function π of the pattern</label>
+      <div class="lps" id="lps"></div>
+      <p class="note">Raw hits count every occurrence, like "ac" inside "sp<b>ac</b>ious". The filter keeps whole words and drops "Non AC".</p>
+    </div>
+    <div class="col"><div class="scroll"><table><thead><tr><th>PG</th><th>Listing text</th><th class="n">Hits</th></tr></thead><tbody id="kmpBody"></tbody></table></div></div>
+  </div>
+</section>
+
+<section class="pane" id="p-dij">
+  <div class="row">
+    <div class="col">
+      <svg class="map" id="map" viewBox="0 0 640 430" role="img" aria-label="City road graph with the shortest-path tree highlighted"></svg>
+      <p class="note">Blue edges form Dijkstra's shortest-path tree from your origin. Numbers on roads are minutes.</p>
+    </div>
+    <div class="col" style="flex:0 1 340px">
+      <table><thead><tr><th>Locality</th><th class="n">Min</th><th>Route</th></tr></thead><tbody id="dijBody"></tbody></table>
+      <p class="note" id="fwCheck"></p>
+    </div>
+  </div>
+  <h3 style="font-size:15px;margin:22px 0 8px">Floyd–Warshall all-pairs table (minutes)</h3>
+  <div class="scroll"><table class="fw" id="fw"></table></div>
+</section>
+
+<section class="pane" id="p-rank">
+  <div class="row">
+    <div class="col" style="flex:0 1 280px">
+      <div class="ctl"><label>Rating weight <span class="val" id="wRv"></span></label><input type="range" id="wR" min="0" max="100" value="40"></div>
+      <div class="ctl"><label>Affordability weight <span class="val" id="wAv"></span></label><input type="range" id="wA" min="0" max="100" value="35"></div>
+      <div class="ctl"><label>Short commute weight <span class="val" id="wCv"></span></label><input type="range" id="wC" min="0" max="100" value="25"></div>
+      <div class="ctl"><label>Show top k <span class="val" id="kv"></span></label><input type="range" id="k" min="1" max="8" value="3"></div>
+      <p class="note">A min-heap of size k scans all PGs once: O(N log k) instead of sorting all N.</p>
+    </div>
+    <div class="col"><div class="scroll"><table><thead><tr><th>#</th><th>PG</th><th class="n">Score</th><th class="n">Rent ₹</th><th class="n">Commute</th><th class="n">Rating</th></tr></thead><tbody id="rankBody"></tbody></table></div></div>
+  </div>
+</section>
+
+<section class="pane" id="p-knap">
+  <div class="row">
+    <div class="col" style="flex:0 1 300px">
+      <div class="ctl"><label>Monthly add-on budget <span class="val" id="budv"></span></label><input type="range" id="bud" min="0" max="5500" step="50" value="3500"></div>
+      <div class="stat"><div class="win"><b id="dpU">0</b><span>DP utility · ₹<span id="dpC"></span></span></div><div><b id="grU">0</b><span>Greedy utility · ₹<span id="grC"></span></span></div></div>
+      <p class="note" id="knapNote"></p>
+    </div>
+    <div class="col"><table><thead><tr><th>Add-on</th><th class="n">Cost ₹</th><th class="n">Utility</th><th>DP</th><th>Greedy</th></tr></thead><tbody id="knapBody"></tbody></table></div>
+  </div>
+</section>
+
+<section class="pane" id="p-flow">
+  <div class="stat" id="flowStat"></div>
+  <div class="row">
+    <div class="col"><div class="scroll"><table><thead><tr><th>Student</th><th class="n">Budget ₹</th><th class="n">Max min</th><th class="n">Options</th><th>Max-flow</th><th>Greedy</th></tr></thead><tbody id="flowBody"></tbody></table></div></div>
+    <div class="col" style="flex:0 1 300px"><table><thead><tr><th>PG</th><th class="n">Beds</th><th class="n">Filled</th></tr></thead><tbody id="bedBody"></tbody></table>
+    <p class="note">Network: source → student (cap 1) → each PG they can afford and reach in time (cap 1) → sink (cap = free beds). Greedy lets students pick their best-rated option in arrival order.</p></div>
+  </div>
+</section>
+
+<h2>Measured running times</h2>
+<p class="sub">Benchmarks from the Python implementation (best of several runs). Each curve grows at the rate its analysis predicts.</p>
+<div class="charts" id="charts"></div>
+
+<footer>DAA Assignment · BCSE204L · Anubhab Baruah (24BPS1152). Sample city data is synthetic and for illustration only.</footer>
+</div>
+
+<script>
+// ---------------- data (same as pg_match.py) ----------------
+const NODES=["Campus","Katpadi Jn","Gandhi Nagar","Sathuvachari","Bagayam","Thorapadi","Old Town","Bus Stand"];
+const POS={"Campus":[90,70],"Gandhi Nagar":[250,95],"Katpadi Jn":[110,215],"Bus Stand":[330,215],"Old Town":[455,255],"Sathuvachari":[310,355],"Bagayam":[470,375],"Thorapadi":[580,250]};
+const ROADS=[["Campus","Katpadi Jn",9],["Campus","Gandhi Nagar",6],["Gandhi Nagar","Katpadi Jn",5],["Gandhi Nagar","Bus Stand",12],["Katpadi Jn","Bus Stand",14],["Bus Stand","Old Town",4],["Bus Stand","Sathuvachari",10],["Sathuvachari","Bagayam",8],["Old Town","Thorapadi",9],["Bagayam","Thorapadi",7],["Old Town","Bagayam",11]];
+const PGS=[
+ ["Sri Sai Residency","Gandhi Nagar",7500,3,4.3,"Spacious rooms with AC, wifi and home food. 5 min walk to main road."],
+ ["Comfort Stay PG","Katpadi Jn",6000,2,3.9,"Non AC twin sharing, wifi, laundry. Near railway station."],
+ ["Nest Co-living","Gandhi Nagar",9800,4,4.6,"Premium co-living, AC rooms, gym, wifi, housekeeping, power backup."],
+ ["Green Valley PG","Sathuvachari",5200,5,3.7,"Budget PG with mess, wifi, quiet locality, CCTV."],
+ ["Royal Boys Hostel","Bus Stand",5800,3,3.5,"Triple sharing, food included, near bus stand, power backup."],
+ ["Lotus Ladies PG","Bagayam",6800,2,4.4,"Ladies only, AC optional, wifi, CCTV, warden on site."],
+ ["Urban Den","Old Town",7200,2,4.0,"Single rooms with attached bath, wifi, laundry, AC."],
+ ["Thorapadi Homes","Thorapadi",4800,4,3.6,"Affordable shared rooms, mess food, water purifier."]];
+const ADDONS=[["AC upgrade",1500,8],["Gym access",700,5],["Daily housekeeping",600,6],["Laundry",400,7],["Unlimited high-speed wifi",300,9],["Dinner plan",1200,7],["Parking",500,3],["Power backup",250,6]];
+const STUDENTS=[["S01",7000,20],["S02",8000,15],["S03",5000,15],["S04",7000,15],["S05",10000,20],["S06",5000,15],["S07",8000,30],["S08",5000,20],["S09",5000,30],["S10",5000,15],["S11",6000,15],["S12",10000,30],["S13",5000,20],["S14",5000,20],["S15",7000,30],["S16",6000,15],["S17",10000,25],["S18",10000,20],["S19",5000,20],["S20",7000,15]];
+const BENCH={apsp:[[50,2.32,4.17],[100,9.62,31.26],[150,21.91,118.72],[200,44.19,248.52],[250,68.59,521.7],[300,96.56,870.66]],dijkstra:[[10000,59994,65.93],[20000,119998,122.98],[40000,239992,274.26],[80000,479992,611.22],[160000,959992,1563.45]],kmp:[[5000,125.28,0.8],[10000,264.28,1.55],[20000,522.16,3.08],[40000,1081.81,6.36]],knap:[[50,2000,100000,7.43],[100,2000,200000,14.49],[100,4000,400000,33.04],[200,4000,800000,64.08],[200,8000,1600000,144.19]],topk:[[100000,8.48,43.46],[200000,13.51,122.74],[400000,25.81,278.51],[800000,45.84,785.81]],flow:[[200,20,1000,160,10.3],[400,40,2000,320,39.44],[800,80,4000,640,193.81],[1600,160,8000,1280,792.4]]};
+
+// ---------------- algorithms ----------------
+function kmpPrefix(p){const pi=new Array(p.length).fill(0);let k=0;for(let i=1;i<p.length;i++){while(k>0&&p[i]!==p[k])k=pi[k-1];if(p[i]===p[k])k++;pi[i]=k;}return pi;}
+function kmpSearch(t,p){if(!p)return[];const pi=kmpPrefix(p),res=[];let q=0;for(let i=0;i<t.length;i++){while(q>0&&t[i]!==p[q])q=pi[q-1];if(t[i]===p[q])q++;if(q===p.length){res.push(i-p.length+1);q=pi[q-1];}}return res;}
+const isAl=c=>/[a-z0-9]/i.test(c);
+function realHits(text,word){const t=text.toLowerCase(),w=word.toLowerCase();return kmpSearch(t,w).filter(i=>{const b=i>0?t[i-1]:" ",a=i+w.length<t.length?t[i+w.length]:" ";if(isAl(b)||isAl(a))return false;return t.slice(Math.max(0,i-4),i).trim()!=="non";});}
+
+class MinHeap{constructor(){this.a=[]}get size(){return this.a.length}peek(){return this.a[0]}
+ push(x){const a=this.a;a.push(x);let i=a.length-1;while(i>0){const p=(i-1)>>1;if(a[p][0]<=a[i][0])break;[a[p],a[i]]=[a[i],a[p]];i=p;}}
+ pop(){const a=this.a,top=a[0],last=a.pop();if(a.length){a[0]=last;let i=0;for(;;){let l=2*i+1,r=l+1,m=i;if(l<a.length&&a[l][0]<a[m][0])m=l;if(r<a.length&&a[r][0]<a[m][0])m=r;if(m===i)break;[a[m],a[i]]=[a[i],a[m]];i=m;}}return top;}}
+
+function adjacency(){const adj={};NODES.forEach(n=>adj[n]=[]);ROADS.forEach(([u,v,w])=>{adj[u].push([v,w]);adj[v].push([u,w]);});return adj;}
+function dijkstra(adj,src){const dist={},par={};NODES.forEach(n=>{dist[n]=Infinity;par[n]=null});dist[src]=0;const h=new MinHeap();h.push([0,src]);
+ while(h.size){const[d,u]=h.pop();if(d>dist[u])continue;for(const[v,w]of adj[u]){if(d+w<dist[v]){dist[v]=d+w;par[v]=u;h.push([dist[v],v]);}}}return{dist,par};}
+function pathTo(par,t){const p=[];while(t!==null){p.push(t);t=par[t];}return p.reverse();}
+function floyd(){const n=NODES.length,ix=Object.fromEntries(NODES.map((x,i)=>[x,i]));const d=[...Array(n)].map((_,i)=>[...Array(n)].map((_,j)=>i===j?0:Infinity));
+ ROADS.forEach(([u,v,w])=>{d[ix[u]][ix[v]]=Math.min(d[ix[u]][ix[v]],w);d[ix[v]][ix[u]]=Math.min(d[ix[v]][ix[u]],w);});
+ for(let k=0;k<n;k++)for(let i=0;i<n;i++)for(let j=0;j<n;j++)if(d[i][k]+d[k][j]<d[i][j])d[i][j]=d[i][k]+d[k][j];return d;}
+function knapsack(items,W){const n=items.length,dp=[...Array(n+1)].map(()=>new Array(W+1).fill(0));
+ for(let i=1;i<=n;i++){const[,c,u]=items[i-1];for(let w=0;w<=W;w++){dp[i][w]=dp[i-1][w];if(c<=w&&dp[i-1][w-c]+u>dp[i][w])dp[i][w]=dp[i-1][w-c]+u;}}
+ const ch=new Set();let w=W;for(let i=n;i>0;i--)if(dp[i][w]!==dp[i-1][w]){ch.add(items[i-1][0]);w-=items[i-1][1];}return{u:dp[n][W],ch};}
+function greedyKnap(items,W){const ch=new Set();let c=0,u=0;[...items].sort((a,b)=>b[2]/b[1]-a[2]/a[1]).forEach(([n,cc,uu])=>{if(c+cc<=W){ch.add(n);c+=cc;u+=uu;}});return{u,c,ch};}
+function topK(scored,k){const h=new MinHeap();for(const it of scored){if(h.size<k)h.push(it);else if(it[0]>h.peek()[0]){h.pop();h.push(it);}}return h.a.slice().sort((a,b)=>b[0]-a[0]);}
+function edmondsKarp(N,edges,s,t){const cap=[...Array(N)].map(()=>new Map());const add=(u,v,c)=>{cap[u].set(v,(cap[u].get(v)||0)+c);if(!cap[v].has(u))cap[v].set(u,0);};edges.forEach(e=>add(...e));
+ let flow=0;for(;;){const par=new Array(N).fill(-1);par[s]=s;const q=[s];let h=0;while(h<q.length&&par[t]===-1){const u=q[h++];for(const[v,c]of cap[u])if(c>0&&par[v]===-1){par[v]=u;q.push(v);}}
+  if(par[t]===-1)return{flow,cap};let b=Infinity;for(let v=t;v!==s;v=par[v])b=Math.min(b,cap[par[v]].get(v));for(let v=t;v!==s;v=par[v]){const u=par[v];cap[u].set(v,cap[u].get(v)-b);cap[v].set(u,cap[v].get(u)+b);}flow+=b;}}
+
+// ---------------- UI ----------------
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const ADJ=adjacency(),FW=floyd();
+let origin="Campus",DIST,PAR;
+NODES.forEach(n=>{const o=document.createElement("option");o.value=n;o.textContent=n;$("origin").appendChild(o);});
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",x===b));document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("on",p.id===b.dataset.p));});
+
+function renderKMP(){const p=$("pat").value.trim();const pl=p.toLowerCase();let raw=0,real=0;
+ $("lps").innerHTML=p?kmpPrefix(pl).map((v,i)=>`<div>${esc(p[i])}<i>${v}</i></div>`).join(""):"";
+ $("kmpBody").innerHTML=PGS.map(pg=>{const t=pg[5],hits=p?kmpSearch(t.toLowerCase(),pl):[],ok=p?realHits(t,p):[];raw+=hits.length;if(ok.length)real++;
+  const okS=new Set(ok);let out="",last=0;hits.forEach(i=>{if(i<last)return;out+=esc(t.slice(last,i))+(okS.has(i)?`<mark>${esc(t.substr(i,p.length))}</mark>`:`<u>${esc(t.substr(i,p.length))}</u>`);last=i+p.length;});out+=esc(t.slice(last));
+  return `<tr><td><b>${pg[0]}</b>${ok.length?' <span class="pill on">match</span>':''}</td><td>${out}</td><td class="n">${hits.length}</td></tr>`;}).join("");
+ $("kmpRaw").textContent=raw;$("kmpReal").textContent=real;}
+
+function renderMap(){const tree=new Set(NODES.filter(n=>PAR[n]).map(n=>[n,PAR[n]].sort().join("|")));
+ const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v);let s="";
+ ROADS.forEach(([u,v,w])=>{const[a,b]=[POS[u],POS[v]],on=tree.has([u,v].sort().join("|"));const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2;
+  s+=`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${on?css('--accent'):css('--line')}" stroke-width="${on?4:2}" stroke-linecap="round"/>`;
+  s+=`<rect x="${mx-13}" y="${my-10}" width="26" height="19" rx="5" fill="${css('--panel')}" stroke="${css('--line')}"/><text x="${mx}" y="${my+4}" text-anchor="middle" font-size="11.5" fill="${css('--muted')}">${w}</text>`;});
+ NODES.forEach(n=>{const[x,y]=POS[n],me=n===origin;const pgs=PGS.filter(p=>p[1]===n).length;
+  s+=`<circle cx="${x}" cy="${y}" r="${me?11:8}" fill="${me?css('--accent'):css('--panel')}" stroke="${me?css('--accent'):css('--muted')}" stroke-width="2"/>`;
+  s+=`<text x="${x}" y="${y-17}" text-anchor="middle" font-size="13" font-weight="600" fill="${css('--ink')}">${n}</text>`;
+  s+=`<text x="${x}" y="${y+27}" text-anchor="middle" font-size="11.5" fill="${css('--muted')}">${me?'origin':DIST[n]+' min'}${pgs?' · '+pgs+' PG'+(pgs>1?'s':''):''}</text>`;});
+ $("map").innerHTML=s;}
+
+function renderDij(){const r=dijkstra(ADJ,origin);DIST=r.dist;PAR=r.par;
+ $("dijBody").innerHTML=[...NODES].sort((a,b)=>DIST[a]-DIST[b]).map(n=>`<tr><td>${n}</td><td class="n">${DIST[n]}</td><td style="font-size:12.5px;color:var(--muted)">${pathTo(PAR,n).join(" → ")}</td></tr>`).join("");
+ const oi=NODES.indexOf(origin),ok=NODES.every((n,j)=>FW[oi][j]===DIST[n]);
+ $("fwCheck").innerHTML=ok?`✓ Floyd–Warshall's “${origin}” row matches Dijkstra on all ${NODES.length} localities.`:"✗ mismatch";
+ $("fw").innerHTML=`<tr><th></th>${NODES.map(n=>`<th>${n.replace(" ","<br>")}</th>`).join("")}</tr>`+NODES.map((n,i)=>`<tr><th style="text-align:left">${n}</th>${FW[i].map(v=>`<td class="${i===oi?'hi':''}">${v}</td>`).join("")}</tr>`).join("");
+ renderMap();}
+
+function renderRank(){const wR=+$("wR").value,wA=+$("wA").value,wC=+$("wC").value,k=+$("k").value,tot=(wR+wA+wC)||1;
+ ["wR","wA","wC"].forEach(id=>$(id+"v").textContent=Math.round(+$(id).value/tot*100)+"%");$("kv").textContent=k;
+ const lo=Math.min(...PGS.map(p=>p[2])),hi=Math.max(...PGS.map(p=>p[2])),hc=Math.max(...PGS.map(p=>DIST[p[1]]))||1;
+ const scored=PGS.map(p=>[100*(wR*p[4]/5+wA*(hi-p[2])/(hi-lo)+wC*(1-DIST[p[1]]/hc))/tot,p]);
+ $("rankBody").innerHTML=topK(scored,k).map(([s,p],i)=>`<tr><td>${i+1}</td><td><b>${p[0]}</b><br><span style="font-size:12.5px;color:var(--muted)">${p[1]}</span></td><td class="n"><b>${s.toFixed(1)}</b></td><td class="n">${p[2].toLocaleString("en-IN")}</td><td class="n">${DIST[p[1]]} min</td><td class="n">${p[4]}</td></tr>`).join("");}
+
+function renderKnap(){const W=+$("bud").value;$("budv").textContent="₹"+W.toLocaleString("en-IN");
+ const dp=knapsack(ADDONS,W),gr=greedyKnap(ADDONS,W),dc=ADDONS.filter(a=>dp.ch.has(a[0])).reduce((s,a)=>s+a[1],0);
+ $("dpU").textContent=dp.u;$("dpC").textContent=dc.toLocaleString("en-IN");$("grU").textContent=gr.u;$("grC").textContent=gr.c.toLocaleString("en-IN");
+ $("knapNote").innerHTML=dp.u>gr.u?`DP beats greedy by <b>${dp.u-gr.u}</b> points: greedy fills up on high-ratio items and leaves ₹${(W-gr.c).toLocaleString("en-IN")} it can't use well.`:`At this budget greedy happens to match the optimum. Try ₹3,250–₹3,900 to see it fail.`;
+ const mk=on=>on?'<span class="pill on">✓</span>':'<span style="color:var(--muted)">—</span>';
+ $("knapBody").innerHTML=ADDONS.map(a=>`<tr><td>${a[0]}</td><td class="n">${a[1]}</td><td class="n">${a[2]}</td><td>${mk(dp.ch.has(a[0]))}</td><td>${mk(gr.ch.has(a[0]))}</td></tr>`).join("");}
+
+function renderFlow(){const ns=STUDENTS.length,S=0,T=1,sid=i=>2+i,pid=j=>2+ns+j,edges=[];
+ const elig=STUDENTS.map(st=>PGS.map((p,j)=>p[2]<=st[1]&&DIST[p[1]]<=st[2]?j:-1).filter(j=>j>=0));
+ STUDENTS.forEach((st,i)=>{edges.push([S,sid(i),1]);elig[i].forEach(j=>edges.push([sid(i),pid(j),1]));});PGS.forEach((p,j)=>edges.push([pid(j),T,p[3]]));
+ const{flow,cap}=edmondsKarp(2+ns+PGS.length,edges,S,T);
+ const mf=STUDENTS.map((st,i)=>{const j=elig[i].find(j=>cap[sid(i)].get(pid(j))===0);return j===undefined?null:j;});
+ const beds=PGS.map(p=>p[3]),gr=STUDENTS.map((st,i)=>{const o=elig[i].filter(j=>beds[j]>0);if(!o.length)return null;const j=o.reduce((a,b)=>PGS[b][4]>PGS[a][4]?b:a);beds[j]--;return j;});
+ const gN=gr.filter(x=>x!==null).length,can=elig.filter(e=>e.length).length,totBeds=PGS.reduce((s,p)=>s+p[3],0);
+ $("flowStat").innerHTML=`<div class="win"><b>${flow}</b><span>placed by max-flow (optimal)</span></div><div><b>${gN}</b><span>placed by greedy</span></div><div><b>${can}</b><span>students with ≥ 1 option</span></div><div><b>${totBeds}</b><span>free beds</span></div>`;
+ const nm=j=>j===null?'<span style="color:var(--muted)">—</span>':PGS[j][0];
+ $("flowBody").innerHTML=STUDENTS.map((st,i)=>`<tr><td>${st[0]}</td><td class="n">${st[1].toLocaleString("en-IN")}</td><td class="n">${st[2]}</td><td class="n">${elig[i].length}</td><td>${mf[i]===null?nm(null):'<b>'+nm(mf[i])+'</b>'}</td><td style="${gr[i]===null&&mf[i]!==null?'color:var(--bad)':''}">${gr[i]===null&&mf[i]!==null?'unplaced':nm(gr[i])}</td></tr>`).join("");
+ $("bedBody").innerHTML=PGS.map((p,j)=>`<tr><td>${p[0]}</td><td class="n">${p[3]}</td><td class="n">${mf.filter(x=>x===j).length}</td></tr>`).join("");}
+
+function chart(title,sub,xs,series,xl,yl){const W=320,H=190,L=46,R=12,T=12,B=34,x0=Math.min(...xs),x1=Math.max(...xs),ym=Math.max(...series.flatMap(s=>s.v))*1.08;
+ const X=x=>L+(x-x0)/(x1-x0)*(W-L-R),Y=y=>H-B-y/ym*(H-B-T),ticks=[0,ym/2/1.08,ym/1.08].map(v=>Math.round(v));
+ const fmt=v=>v>=1e6?+(v/1e6).toFixed(1)+"M":v>=1000?Math.round(v/1000)+"k":v;let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${title}">`;
+ ticks.forEach(t=>{s+=`<line x1="${L}" x2="${W-R}" y1="${Y(t)}" y2="${Y(t)}" stroke="var(--line)"/><text x="${L-6}" y="${Y(t)+4}" text-anchor="end" font-size="10.5" fill="var(--muted)">${t}</text>`;});
+ let lastX=-99;xs.forEach(x=>{if(X(x)-lastX<34)return;lastX=X(x);s+=`<text x="${X(x)}" y="${H-B+15}" text-anchor="middle" font-size="10.5" fill="var(--muted)">${fmt(x)}</text>`;});
+ s+=`<text x="${(L+W-R)/2}" y="${H-4}" text-anchor="middle" font-size="10.5" fill="var(--muted)">${xl}</text><text x="4" y="${T+2}" font-size="10.5" fill="var(--muted)">${yl}</text>`;
+ series.forEach(se=>{s+=`<path d="${se.v.map((v,i)=>(i?"L":"M")+X(xs[i])+" "+Y(v)).join("")}" fill="none" stroke="${se.c}" stroke-width="2.25"/>`+se.v.map((v,i)=>`<circle cx="${X(xs[i])}" cy="${Y(v)}" r="3" fill="${se.c}"><title>${se.n}: ${v} ms at ${xs[i].toLocaleString()}</title></circle>`).join("");});
+ return `<div class="card chart"><h3>${title}</h3><p>${sub}</p>${s}</svg><div class="legend">${series.map(se=>`<span><i style="background:${se.c}"></i>${se.n}</span>`).join("")}</div></div>`;}
+const A="var(--accent)",M="var(--muted)";
+$("charts").innerHTML=
+ chart("Floyd–Warshall grows as n³","9× slower than V runs of Dijkstra at n = 300",BENCH.apsp.map(r=>r[0]),[{n:"Floyd–Warshall",c:A,v:BENCH.apsp.map(r=>r[2])},{n:"V × Dijkstra",c:M,v:BENCH.apsp.map(r=>r[1])}],"vertices","ms")+
+ chart("KMP is ~170× faster than naive","Adversarial text a…a, pattern a…ab (m = 500)",BENCH.kmp.map(r=>r[0]),[{n:"Naive",c:M,v:BENCH.kmp.map(r=>r[1])},{n:"KMP",c:A,v:BENCH.kmp.map(r=>r[2])}],"text length","ms")+
+ chart("Heap top-k beats a full sort","Top 10 of N items: 46 ms vs 786 ms at N = 800k",BENCH.topk.map(r=>r[0]),[{n:"Full sort",c:M,v:BENCH.topk.map(r=>r[2])},{n:"Heap top-k",c:A,v:BENCH.topk.map(r=>r[1])}],"N","ms")+
+ chart("Dijkstra is near-linear in E","Single source, average degree 6",BENCH.dijkstra.map(r=>r[1]),[{n:"Dijkstra",c:A,v:BENCH.dijkstra.map(r=>r[2])}],"edges","ms")+
+ chart("Knapsack is linear in n·W","Pseudo-polynomial: doubling the budget doubles the time",BENCH.knap.map(r=>r[2]),[{n:"0/1 Knapsack DP",c:A,v:BENCH.knap.map(r=>r[3])}],"n · W","ms")+
+ chart("Edmonds–Karp ≈ E² here","Far under the O(V·E²) worst case",BENCH.flow.map(r=>r[2]),[{n:"Edmonds–Karp",c:A,v:BENCH.flow.map(r=>r[4])}],"edges","ms");
+
+function all(){renderDij();renderKMP();renderRank();renderKnap();renderFlow();}
+$("origin").onchange=e=>{origin=e.target.value;all();};
+$("pat").oninput=renderKMP;["wR","wA","wC","k"].forEach(id=>$(id).oninput=renderRank);$("bud").oninput=renderKnap;
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",renderMap);
+all();
+</script>
+</body>
+</html>
