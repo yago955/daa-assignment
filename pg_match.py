@@ -15,6 +15,7 @@ from scratch (only the standard library is used for the algorithms):
 
 Run:  python pg_match.py            (demo on the sample city)
       python pg_match.py --bench    (demo + empirical complexity benchmarks)
+      python pg_match.py --memory   (demo + peak-memory benchmark only)
 """
 
 from __future__ import annotations
@@ -480,10 +481,45 @@ def bench() -> dict:
     return res
 
 
+def _peak_kb(fn, *a):
+    """Peak extra memory (KB) allocated while fn runs, measured with tracemalloc."""
+    import gc
+    import tracemalloc
+    gc.collect()
+    tracemalloc.start()
+    fn(*a)
+    _, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+    return round(peak / 1024, 1)
+
+
+def bench_memory() -> list:
+    """Peak memory of the three ways to get shortest paths (graph itself excluded)."""
+    print("\nPeak memory (KB):  n | Dijkstra 1 source | V x Dijkstra, row at a time | Floyd-Warshall")
+    rows = []
+    for n in [200, 400, 800]:
+        adj, edges = random_graph(n)
+
+        def dijkstra_all_streaming():
+            for s in adj:              # keep only the current row, as a commute lookup needs
+                dijkstra(adj, s)
+        m1 = _peak_kb(dijkstra, adj, 0)
+        m2 = _peak_kb(dijkstra_all_streaming)
+        m3 = _peak_kb(floyd_warshall, n, edges)
+        rows.append((n, m1, m2, m3))
+        print(f"  {n:5d} | {m1:10.1f} | {m2:10.1f} | {m3:10.1f}")
+    return rows
+
+
 if __name__ == "__main__":
     out = demo()
-    if "--bench" in sys.argv:
-        b = bench()
+    if "--bench" in sys.argv or "--memory" in sys.argv:
         import json
+        import os
+        b = json.load(open("bench_results.json")) if os.path.exists("bench_results.json") else {}
+        if "--bench" in sys.argv:
+            b.update(bench())
+        if "--memory" in sys.argv or "--bench" in sys.argv:
+            b["memory"] = bench_memory()
         with open("bench_results.json", "w") as fh:
             json.dump(b, fh, indent=1)
