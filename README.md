@@ -2,6 +2,8 @@
 
 **Anubhab Baruah (24BPS1152)**
 
+**Live demo (runs in the browser, nothing to install):** https://raw.githack.com/yago955/daa-assignment/main/index.html
+
 Six classical algorithms, implemented from scratch, applied to one problem:
 finding a paying-guest (PG) room near campus and allotting students to the beds that are left.
 
@@ -40,6 +42,8 @@ python pg_match.py           # demo on the sample city
 python pg_match.py --bench   # demo + timing and memory benchmarks (a few minutes)
 python pg_match.py --memory  # demo + peak-memory benchmark only
 ```
-Open `index.html` in a browser for the interactive demo.
+Interactive demo: open the live link above, or download/extract the project and double-click `index.html` (it is a single self-contained page; viewing it on GitHub only shows its source code).
+
+Python: requires Python 3.8+ and no extra packages.
 
 Sample city data (localities, rents, travel times) is synthetic and for illustration only.
