@@ -14,6 +14,11 @@ finding a paying-guest (PG) room near campus and allotting students to the beds 
 | 5 | Heap-based top-k | O(N log k) | best k PGs by score |
 | 6 | Edmonds–Karp max flow | O(V · E²) | allot students to PGs under bed limits |
 
+## Base paper
+F. Sapundzhi et al., "A Performance Comparison of Shortest Path Algorithms in Directed Graphs," *Engineering Proceedings* 100(1), 31, 2025. DOI: [10.3390/engproc2025100031](https://doi.org/10.3390/engproc2025100031)
+
+This project extends it: a real application instead of random graphs only, graphs up to 160,000 vertices (vs 1,000), fitted growth exponents, peak-memory measurement (Floyd–Warshall needs 42× more memory than Dijkstra at 800 vertices), and shortest paths feeding KMP search, knapsack DP, heap top-k and max-flow allocation.
+
 ## Key results
 - 0/1 Knapsack DP finds a bundle worth **40** utility points; greedy-by-ratio stops at 36.
 - Max-flow places **10** students (the provable maximum); first-come greedy places 9.
@@ -32,7 +37,8 @@ finding a paying-guest (PG) room near campus and allotting students to the beds 
 ## Run
 ```
 python pg_match.py           # demo on the sample city
-python pg_match.py --bench   # demo + timing benchmarks (~1 min)
+python pg_match.py --bench   # demo + timing and memory benchmarks (a few minutes)
+python pg_match.py --memory  # demo + peak-memory benchmark only
 ```
 Open `index.html` in a browser for the interactive demo.
 
